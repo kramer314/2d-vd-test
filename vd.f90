@@ -4,13 +4,15 @@
 ! 2-dimensional virtual detector module
 module vd
   use progvars
-  use numerics, only: numerics_linspace, numerics_cmplx_phase, numerics_d1
+  use numerics, only: numerics_linspace, numerics_cmplx_phase, numerics_d1, &
+       numerics_trapz
 
   implicit none
 
   private
 
   public :: vd_update
+  public :: vd_normalize
   public :: vd_init
   public :: vd_cleanup
 
@@ -73,6 +75,18 @@ contains
     allocate(jy_arr(nx, ny))
 
   end subroutine vd_init
+
+  subroutine vd_normalize(nkx_arr, nky_arr)
+    real(dp), intent(inout) :: nkx_arr(:), nky_arr(:)
+
+    real(dp) :: nkx_norm, nky_norm
+
+    nkx_norm = 1.0_dp / numerics_trapz(nkx_arr, vd_dkx)
+    nky_norm = 1.0_dp / numerics_trapz(nky_arr, vd_dky)
+
+    nkx_arr(:) = nkx_norm * nkx_arr(:)
+    nky_arr(:) = nky_norm * nky_arr(:)
+  end subroutine vd_normalize
 
   subroutine vd_update(psi_arr, nkx_arr, nky_arr)
     complex(dp), intent(in) :: psi_arr(:,:)

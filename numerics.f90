@@ -15,6 +15,7 @@ module numerics
   public :: numerics_d2
   public :: numerics_rk4
   public :: numerics_cmplx_phase
+  public :: numerics_trapz
 
 contains
 
@@ -161,5 +162,23 @@ contains
     val = atan2(aimag(z),real(z))
 
   end function numerics_cmplx_phase
+
+  real(dp) function numerics_trapz(f_arr, dx) result(val)
+    real(dp), intent(in) :: f_arr(:)
+    real(dp), intent(in) :: dx
+
+    integer(dp) :: i_x
+    real(dp) :: trapz_cnst
+
+    trapz_cnst = dx / 2.0_dp
+    val = 0.0_dp
+
+    do i_x = 1, size(f_arr) - 1
+       val = val + (f_arr(i_x) + f_arr(i_x + 1))
+    end do
+
+    val = val * trapz_cnst
+
+  end function numerics_trapz
 
 end module numerics
