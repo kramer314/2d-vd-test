@@ -52,13 +52,13 @@ contains
     vd_nyr = 5
 
     ! Virtual detector binning parameters
-    vd_kx_min = 0.0_dp
-    vd_kx_max = 10.0_dp
-    vd_nkx = int(1e2)
+    vd_px_min = 0.0_dp
+    vd_px_max = 10.0_dp
+    vd_npx = int(1e2)
 
-    vd_ky_min = 0.0_dp
-    vd_ky_max = 10.0_dp
-    vd_nky = int(1e2)
+    vd_py_min = 0.0_dp
+    vd_py_max = 10.0_dp
+    vd_npy = int(1e2)
 
     ! Time parameters
     t_min = 0.0_dp
@@ -67,15 +67,15 @@ contains
 
     ! Output parameters
     output_dir = "./output/"
-    nkx_fname = "kxt.dat"
-    nky_fname = "kyt.dat"
-    output_kx = .true.
-    output_ky = .true.
+    npx_fname = "pxt.dat"
+    npy_fname = "pyt.dat"
+    output_px = .true.
+    output_py = .true.
 
     ! Print filters
     print_mod_t = 10
-    print_mod_kx = 10
-    print_mod_ky = 10
+    print_mod_px = 10
+    print_mod_py = 10
   end subroutine params_init
 
   subroutine params_cleanup()

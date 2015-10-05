@@ -11,8 +11,8 @@ program vd_test
   implicit none
 
   integer(dp) :: i_t
-  integer(dp) :: i_kx, i_ky
-  real(dp) :: kx, ky
+  integer(dp) :: i_px, i_py
+  real(dp) :: px, py
 
   call setup_init()
 
@@ -33,7 +33,7 @@ program vd_test
   do i_t = 1, nt
      call propagate_psi(psi_arr, i_t)
 
-     call vd_update(psi_arr, nkx_arr, nky_arr)
+     call vd_update(psi_arr, npx_arr, npy_arr)
 
      if (mod(i_t, print_mod_t) .eq. 0) then
         write(*,*) i_t, nt
@@ -41,19 +41,19 @@ program vd_test
      end if
   end do
 
-  call vd_normalize(nkx_arr, nky_arr)
+  call vd_normalize(npx_arr, npy_arr)
 
 
   open(98, file="vd_x.dat")
   open(99, file="vd_y.dat")
 
-  do i_kx = 1, size(nkx_arr)
-     kx = vd_kx_arr(i_kx)
-     write(98,*) kx, nkx_arr(i_kx), abs(gaussian_px(kx))**2
+  do i_px = 1, size(npx_arr)
+     px = vd_px_arr(i_px)
+     write(98,*) px, npx_arr(i_px), abs(gaussian_px(px))**2
   end do
-  do i_ky = 1, size(nky_arr)
-     ky = vd_ky_arr(i_ky)
-     write(99, *) ky, nky_arr(i_ky), abs(gaussian_py(ky))**2
+  do i_py = 1, size(npy_arr)
+     py = vd_py_arr(i_py)
+     write(99, *) py, npy_arr(i_py), abs(gaussian_py(py))**2
   end do
 
   call setup_cleanup()

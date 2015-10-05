@@ -17,7 +17,7 @@ module vd
   public :: vd_cleanup
 
   ! Work arrays
-  complex(dp), allocatable :: phi_arr(:,:), kx_arr(:,:), ky_arr(:,:)
+  complex(dp), allocatable :: phi_arr(:,:), px_arr(:,:), py_arr(:,:)
   real(dp), allocatable :: mag_arr(:,:), jx_arr(:,:), jy_arr(:,:)
 
 contains
@@ -68,58 +68,58 @@ contains
 
     ! Allocate work arrays
     allocate(phi_arr(nx, ny))
-    allocate(kx_arr(nx, ny))
-    allocate(ky_arr(nx, ny))
+    allocate(px_arr(nx, ny))
+    allocate(py_arr(nx, ny))
     allocate(mag_arr(nx, ny))
     allocate(jx_arr(nx, ny))
     allocate(jy_arr(nx, ny))
 
   end subroutine vd_init
 
-  subroutine vd_normalize(nkx_arr, nky_arr)
-    real(dp), intent(inout) :: nkx_arr(:), nky_arr(:)
+  subroutine vd_normalize(npx_arr, npy_arr)
+    real(dp), intent(inout) :: npx_arr(:), npy_arr(:)
 
-    real(dp) :: nkx_norm, nky_norm
+    real(dp) :: npx_norm, npy_norm
 
-    nkx_norm = 1.0_dp / numerics_trapz(nkx_arr, vd_dkx)
-    nky_norm = 1.0_dp / numerics_trapz(nky_arr, vd_dky)
+    npx_norm = 1.0_dp / numerics_trapz(npx_arr, vd_dpx)
+    npy_norm = 1.0_dp / numerics_trapz(npy_arr, vd_dpy)
 
-    nkx_arr(:) = nkx_norm * nkx_arr(:)
-    nky_arr(:) = nky_norm * nky_arr(:)
+    npx_arr(:) = npx_norm * npx_arr(:)
+    npy_arr(:) = npy_norm * npy_arr(:)
   end subroutine vd_normalize
 
-  subroutine vd_update(psi_arr, nkx_arr, nky_arr)
+  subroutine vd_update(psi_arr, npx_arr, npy_arr)
     complex(dp), intent(in) :: psi_arr(:,:)
-    real(dp) :: nkx_arr(:), nky_arr(:)
+    real(dp) :: npx_arr(:), npy_arr(:)
 
     call vd_fill_arrays(psi_arr)
-    call vd_calc_kj()
-    call vd_bin(nkx_arr, nky_arr)
+    call vd_calc_pj()
+    call vd_bin(npx_arr, npy_arr)
 
   end subroutine vd_update
 
-  subroutine vd_bin(nkx_arr, nky_arr)
+  subroutine vd_bin(npx_arr, npy_arr)
     integer(dp) :: i_x, i_y
 
-    real(dp), intent(inout) :: nkx_arr(:), nky_arr(:)
+    real(dp), intent(inout) :: npx_arr(:), npy_arr(:)
 
     ! Go along the entirety of the y-edge (bottom to top)
     do i_y = vd_yl_min, vd_yr_max
 
        ! Accumulate counts along the left side
        do i_x = vd_xl_min, vd_xl_max
-          call accumulate_counts(i_x, i_y, kx_arr, jx_arr, nkx_arr, &
-               vd_kx_arr, vd_dkx)
-          call accumulate_counts(i_x, i_y, ky_arr, jy_arr, nky_arr, &
-               vd_ky_arr, vd_dky)
+          call accumulate_counts(i_x, i_y, px_arr, jx_arr, npx_arr, &
+               vd_px_arr, vd_dpx)
+          call accumulate_counts(i_x, i_y, py_arr, jy_arr, npy_arr, &
+               vd_py_arr, vd_dpy)
        end do
 
        ! Accumulate counts along the right side
        do i_x = vd_xr_min, vd_xr_max
-          call accumulate_counts(i_x, i_y, kx_arr, jx_arr, nkx_arr, &
-               vd_kx_arr, vd_dkx)
-          call accumulate_counts(i_x, i_y, ky_arr, jy_arr, nky_arr, &
-               vd_ky_arr, vd_dky)
+          call accumulate_counts(i_x, i_y, px_arr, jx_arr, npx_arr, &
+               vd_px_arr, vd_dpx)
+          call accumulate_counts(i_x, i_y, py_arr, jy_arr, npy_arr, &
+               vd_py_arr, vd_dpy)
        end do
 
     end do
@@ -129,54 +129,54 @@ contains
 
        ! Accumulate counts along the bottom side
        do i_y = vd_yl_min, vd_yl_max
-          call accumulate_counts(i_x, i_y, kx_arr, jx_arr, nkx_arr, &
-               vd_kx_arr, vd_dkx)
-          call accumulate_counts(i_x, i_y, ky_arr, jy_arr, nky_arr, &
-               vd_ky_arr, vd_dky)
+          call accumulate_counts(i_x, i_y, px_arr, jx_arr, npx_arr, &
+               vd_px_arr, vd_dpx)
+          call accumulate_counts(i_x, i_y, py_arr, jy_arr, npy_arr, &
+               vd_py_arr, vd_dpy)
        end do
 
        ! Accumulate counts along the top side
        do i_y = vd_yr_min, vd_yr_max
-          call accumulate_counts(i_x, i_y, kx_arr, jx_arr, nkx_arr, &
-               vd_kx_arr, vd_dkx)
-          call accumulate_counts(i_x, i_y, ky_arr, jy_arr, nky_arr, &
-               vd_ky_arr, vd_dky)
+          call accumulate_counts(i_x, i_y, px_arr, jx_arr, npx_arr, &
+               vd_px_arr, vd_dpx)
+          call accumulate_counts(i_x, i_y, py_arr, jy_arr, npy_arr, &
+               vd_py_arr, vd_dpy)
        end do
     end do
-
+!
   contains
-    subroutine accumulate_counts(i_x, i_y, k_arr, j_arr, count_arr,&
-         k_bin_arr, dk_bin)
+    subroutine accumulate_counts(i_x, i_y, p_arr, j_arr, count_arr,&
+         p_bin_arr, dp_bin)
       integer(dp), intent(in) :: i_x, i_y
       real(dp), intent(inout) :: count_arr(:)
-      complex(dp), intent(in) :: k_arr(:,:)
+      complex(dp), intent(in) :: p_arr(:,:)
       real(dp), intent(in) :: j_arr(:,:)
-      real(dp), intent(in) :: k_bin_arr(:), dk_bin
+      real(dp), intent(in) :: p_bin_arr(:), dp_bin
 
-      real(dp) :: k_bin_min
-      integer(dp) :: i_k
-      real(dp) :: k
+      real(dp) :: p_bin_min
+      integer(dp) :: i_p
+      real(dp) :: p
 
-      k = real(k_arr(i_x, i_y))
+      p = real(p_arr(i_x, i_y))
 
       ! Mid-point histogram
-      k_bin_min = k_bin_arr(1) - dk_bin / 2
+      p_bin_min = p_bin_arr(1) - dp_bin / 2
 
       ! Calculate bin index - much more efficient than brute force
-      i_k = ceiling((k - k_bin_min) / dk_bin)
+      i_p = ceiling((p - p_bin_min) / dp_bin)
 
-      if (i_k .ge. 1 .and. i_k .le. size(k_bin_arr)) then
-         count_arr(i_k) = count_arr(i_k) + dk_bin * abs(j_arr(i_x, i_y)) * dt
+      if (i_p .ge. 1 .and. i_p .le. size(p_bin_arr)) then
+         count_arr(i_p) = count_arr(i_p) + dp_bin * abs(j_arr(i_x, i_y)) * dt
       end if
 
     end subroutine accumulate_counts
   end subroutine vd_bin
 
-  subroutine vd_calc_kj()
+  subroutine vd_calc_pj()
 
     integer(dp) :: i_x, i_y
 
-    ! Iterate over each y index and calculate x-component of k, j
+    ! Iterate over each y index and calculate x-component of p, j
     do i_y = vd_yl_min - 1, vd_yl_max + 1
        call calc_along_x(vd_xl_min - 1, vd_xr_max + 1, i_y)
     end do
@@ -188,7 +188,7 @@ contains
        call calc_along_x(vd_xr_min - 1, vd_xr_max + 1, i_y)
     end do
 
-    ! Iterate over each x index and calculate y-component of k, j
+    ! Iterate over each x index and calculate y-component of p, j
     do i_x = vd_xl_min - 1, vd_xl_max + 1
        call calc_along_y(i_x, vd_yl_min - 1, vd_yr_max + 1)
     end do
@@ -206,21 +206,21 @@ contains
       integer(dp) :: i_x_min, i_x_max, i_y
 
       call numerics_d1(phi_arr(i_x_min:i_x_max, i_y), &
-           kx_arr(i_x_min:i_x_max, i_y), dx)
+           px_arr(i_x_min:i_x_max, i_y), dx)
       jx_arr(i_x_min:i_x_max, i_y) = real(mag_arr(i_x_min:i_x_max, i_y) / m * &
-           kx_arr(i_x_min:i_x_max, i_y))
+           px_arr(i_x_min:i_x_max, i_y))
     end subroutine calc_along_x
 
     subroutine calc_along_y(i_x, i_y_min, i_y_max)
       integer(dp) :: i_x, i_y_min, i_y_max
 
       call numerics_d1(phi_arr(i_x, i_y_min:i_y_max), &
-           ky_arr(i_x, i_y_min:i_y_max), dy)
+           py_arr(i_x, i_y_min:i_y_max), dy)
       jy_arr(i_x, i_y_min:i_y_max) = real(mag_arr(i_x, i_y_min:i_y_max) / m * &
-           ky_arr(i_x, i_y_min:i_y_max))
+           py_arr(i_x, i_y_min:i_y_max))
     end subroutine calc_along_y
 
-  end subroutine vd_calc_kj
+  end subroutine vd_calc_pj
 
   subroutine vd_fill_arrays(psi_arr)
 
@@ -279,8 +279,8 @@ contains
   subroutine vd_cleanup()
 
     deallocate(phi_arr)
-    deallocate(kx_arr)
-    deallocate(ky_arr)
+    deallocate(px_arr)
+    deallocate(py_arr)
     deallocate(mag_arr)
     deallocate(jx_arr)
     deallocate(jy_arr)

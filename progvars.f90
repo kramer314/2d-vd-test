@@ -39,9 +39,9 @@ module progvars
   integer(dp) :: vd_yl_min, vd_yl_max, vd_yr_min, vd_yr_max
  
   ! Virtual detector momentum bin parameters
-  real(dp) :: vd_kx_min, vd_kx_max, vd_dkx
-  real(dp) :: vd_ky_min, vd_ky_max, vd_dky
-  integer(dp) :: vd_nkx, vd_nky
+  real(dp) :: vd_px_min, vd_px_max, vd_dpx
+  real(dp) :: vd_py_min, vd_py_max, vd_dpy
+  integer(dp) :: vd_npx, vd_npy
 
   ! Time grid parameters
   real(dp) :: t_min, t_max, dt
@@ -49,14 +49,14 @@ module progvars
 
   ! Output parameters
   character(120) :: output_dir
-  character(120) :: nkx_fname, nky_fname
-  logical :: output_kx, output_ky
-  integer(dp) :: print_mod_t, print_mod_kx, print_mod_ky
+  character(120) :: npx_fname, npy_fname
+  logical :: output_px, output_py
+  integer(dp) :: print_mod_t, print_mod_px, print_mod_py
 
   ! Arrays
   real(dp), allocatable :: x_range(:), y_range(:), t_range(:)
-  real(dp), allocatable :: vd_kx_arr(:), vd_ky_arr(:)
-  real(dp), allocatable :: nkx_arr(:), nky_arr(:)
+  real(dp), allocatable :: vd_px_arr(:), vd_py_arr(:)
+  real(dp), allocatable :: npx_arr(:), npy_arr(:)
   complex(dp), allocatable :: psi_arr(:,:)
 
 end module progvars

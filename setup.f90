@@ -43,12 +43,12 @@ contains
     call numerics_linspace(y_min, y_max, y_range, dy)
 
     ! initialize virtual detector grids
-    call numerics_linspace(vd_kx_min, vd_kx_max, vd_kx_arr, vd_dkx)
-    call numerics_linspace(vd_ky_min, vd_ky_max, vd_ky_arr, vd_dky)
+    call numerics_linspace(vd_px_min, vd_px_max, vd_px_arr, vd_dpx)
+    call numerics_linspace(vd_py_min, vd_py_max, vd_py_arr, vd_dpy)
     
     ! initialize virtual detector counts
-    nkx_arr = 0.0_dp
-    nky_arr = 0.0_dp
+    npx_arr = 0.0_dp
+    npy_arr = 0.0_dp
   end subroutine init_arrays
   
   subroutine allocate_arrays()
@@ -57,11 +57,11 @@ contains
     allocate(x_range(nx))
     allocate(y_range(ny))
 
-    allocate(vd_kx_arr(vd_nkx))
-    allocate(vd_ky_arr(vd_nky))
+    allocate(vd_px_arr(vd_npx))
+    allocate(vd_py_arr(vd_npy))
     
-    allocate(nkx_arr(vd_nkx))
-    allocate(nky_arr(vd_nky))
+    allocate(npx_arr(vd_npx))
+    allocate(npy_arr(vd_npy))
   end subroutine allocate_arrays
 
   subroutine deallocate_arrays()
@@ -70,11 +70,11 @@ contains
     deallocate(x_range)
     deallocate(y_range)
 
-    deallocate(vd_kx_arr)
-    deallocate(vd_ky_arr)
+    deallocate(vd_px_arr)
+    deallocate(vd_py_arr)
     
-    deallocate(nkx_arr)
-    deallocate(nky_arr)
+    deallocate(npx_arr)
+    deallocate(npy_arr)
   end subroutine deallocate_arrays
   
 end module setup
