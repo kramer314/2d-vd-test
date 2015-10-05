@@ -73,7 +73,7 @@ contains
          (2.0_dp * sig_y2 * (1 + jhb_m / sig_y2 * t))
     
     exp_x2 = j_hb * p0_x * (x - p0_x_2m * t)
-    exp_y2 = j_hb * p0_y * (x - p0_y_2m * t)
+    exp_y2 = j_hb * p0_y * (y - p0_y_2m * t)
 
     exp_x = exp(exp_x1 + exp_x2)
     exp_y = exp(exp_y1 + exp_y2)
