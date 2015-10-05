@@ -20,19 +20,19 @@ contains
     ! Gaussian parameters
     En = 10.0_dp
     phi = pi / 4.0_dp ! Equal momentum splitting
-    phi = 0.0_dp
+    !phi = 0.0_dp
     sig_x = 1.0_dp
     sig_y = 1.0_dp
     x0 = 0.0_dp
     y0 = 0.0_dp
 
     ! Numerical grid parameters
-    x_min = 0.0_dp
+    x_min = -10.0_dp
     x_max = 50_dp
     nx = int(1e3)
 
-    y_min = 0.0_dp
-    y_max = 20.0_dp
+    y_min = -10.0_dp
+    y_max = 50.0_dp
     ny = int(1e3)
 
     ! External ("non-interaction") part of the grid
@@ -44,23 +44,23 @@ contains
     ! # of grid points used as virtual detector
     ! (placed right outside the interaction region)
     vd_nxl = 1
-    vd_nxr = 50
+    vd_nxr = 5
     vd_nyl = 1
-    vd_nyr = 1
+    vd_nyr = 5
 
     ! Virtual detector binning parameters
     vd_kx_min = 0.0_dp
     vd_kx_max = 10.0_dp
     vd_nkx = int(1e2)
 
-    vd_ky_min = -1.0_dp
-    vd_ky_max = 1.0_dp
+    vd_ky_min = 0.0_dp
+    vd_ky_max = 10.0_dp
     vd_nky = int(1e2)
 
     ! Time parameters
     t_min = 0.0_dp
-    t_max = 30.0_dp
-    nt = int(1e2)
+    t_max = 20.0_dp
+    nt = int(5e2)
 
     ! Output parameters
     output_dir = "./output/"
