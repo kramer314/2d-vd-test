@@ -1,3 +1,7 @@
+! Copyright (c) 2015 Alex Kramer <kramer.alex.kramer@gmail.com>
+! See the LICENSE.txt file at the top-level directory of this distribution.
+
+! 2-dimensional virtual detector module
 module vd
   use progvars
   use numerics, only: numerics_linspace, numerics_cmplx_phase, numerics_d1
