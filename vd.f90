@@ -2,14 +2,7 @@ module vd
   use progvars
   use numerics, only: numerics_linspace, numerics_cmplx_phase, numerics_d1
 
-  ! TODO: Actually calculate from 1 outside of VD grid (for derivatives, etc..)
-  ! TODO: Better binning procedure
-  
   implicit none
-
-  ! At each time, for each x, compute k = del(phi), and j = A^2 / mu * k
-  !   bin k - iterate over k_arr and check whether it fits in the bin;
-  !   if so, increment bin count * j
 
   private
 
@@ -18,14 +11,13 @@ module vd
   public :: vd_cleanup
 
   ! Work arrays
-
-  complex(dp), allocatable :: phi_arr(:,:), k_arr(:,:)
-  real(dp), allocatable :: mag_arr(:,:), j_arr(:,:)
+  complex(dp), allocatable :: phi_arr(:,:), kx_arr(:,:), ky_arr(:,:)
+  real(dp), allocatable :: mag_arr(:,:), jx_arr(:,:), jy_arr(:,:)
 
 contains
-  
+
   subroutine vd_init()
-    
+
     logical :: sane
 
     ! Check internal / external / virtual detector grid limits
@@ -70,9 +62,11 @@ contains
 
     ! Allocate work arrays
     allocate(phi_arr(nx, ny))
-    allocate(k_arr(nx, ny))
+    allocate(kx_arr(nx, ny))
+    allocate(ky_arr(nx, ny))
     allocate(mag_arr(nx, ny))
-    allocate(j_arr(nx, ny))
+    allocate(jx_arr(nx, ny))
+    allocate(jy_arr(nx, ny))
 
   end subroutine vd_init
 
@@ -96,12 +90,18 @@ contains
 
        ! Accumulate counts along the left side
        do i_x = vd_xl_min, vd_xl_max
-          call accumulate_counts(i_x, i_y, nkx_arr, vd_kx_arr, vd_dkx)
+          call accumulate_counts(i_x, i_y, kx_arr, jx_arr, nkx_arr, &
+               vd_kx_arr, vd_dkx)
+          call accumulate_counts(i_x, i_y, ky_arr, jy_arr, nky_arr, &
+               vd_ky_arr, vd_dky)
        end do
 
        ! Accumulate counts along the right side
        do i_x = vd_xr_min, vd_xr_max
-          call accumulate_counts(i_x, i_y, nkx_arr, vd_kx_arr, vd_dkx)
+          call accumulate_counts(i_x, i_y, kx_arr, jx_arr, nkx_arr, &
+               vd_kx_arr, vd_dkx)
+          call accumulate_counts(i_x, i_y, ky_arr, jy_arr, nky_arr, &
+               vd_ky_arr, vd_dky)
        end do
 
     end do
@@ -111,19 +111,28 @@ contains
 
        ! Accumulate counts along the bottom side
        do i_y = vd_yl_min, vd_yl_max
-          call accumulate_counts(i_x, i_y, nky_arr, vd_ky_arr, vd_dky)
+          call accumulate_counts(i_x, i_y, kx_arr, jx_arr, nkx_arr, &
+               vd_kx_arr, vd_dkx)
+          call accumulate_counts(i_x, i_y, ky_arr, jy_arr, nky_arr, &
+               vd_ky_arr, vd_dky)
        end do
 
        ! Accumulate counts along the top side
        do i_y = vd_yr_min, vd_yr_max
-          call accumulate_counts(i_x, i_y, nky_arr, vd_ky_arr, vd_dky)
+          call accumulate_counts(i_x, i_y, kx_arr, jx_arr, nkx_arr, &
+               vd_kx_arr, vd_dkx)
+          call accumulate_counts(i_x, i_y, ky_arr, jy_arr, nky_arr, &
+               vd_ky_arr, vd_dky)
        end do
     end do
 
   contains
-    subroutine accumulate_counts(i_x, i_y, count_arr, k_bin_arr, dk_bin)
+    subroutine accumulate_counts(i_x, i_y, k_arr, j_arr, count_arr,&
+         k_bin_arr, dk_bin)
       integer(dp), intent(in) :: i_x, i_y
       real(dp), intent(inout) :: count_arr(:)
+      complex(dp), intent(in) :: k_arr(:,:)
+      real(dp), intent(in) :: j_arr(:,:)
       real(dp), intent(in) :: k_bin_arr(:), dk_bin
 
       real(dp) :: k_bin_min
@@ -134,19 +143,14 @@ contains
 
       ! Mid-point histogram
       k_bin_min = k_bin_arr(1) - dk_bin / 2
-      
+
+      ! Calculate bin index - much more efficient than brute force
       i_k = ceiling((k - k_bin_min) / dk_bin)
 
       if (i_k .ge. 1 .and. i_k .le. size(k_bin_arr)) then
          count_arr(i_k) = count_arr(i_k) + dk_bin * abs(j_arr(i_x, i_y)) * dt
       end if
 
-      ! Brute-force approach
-      !do i_k = 1, size(k_bin_arr) - 1
-      !  if (k .ge. k_bin_arr(i_k) .and. k .lt. k_bin_arr(i_k + 1)) then
-      !      count_arr(i_k) = count_arr(i_k) + dk_bin * abs(j_arr(i_x, i_y)) * dt
-      !   end if
-      !end do
     end subroutine accumulate_counts
   end subroutine vd_bin
 
@@ -154,24 +158,28 @@ contains
 
     integer(dp) :: i_x, i_y
 
-    ! Go along the entirety of the y-edge (bottom to top)
-    do i_y = vd_yl_min, vd_yr_max
-
-       ! Calculate k,j along the left side
-       call calc_along_x(vd_xl_min, vd_xl_max, i_y)
-       ! Calculate k,j along the right side
-       call calc_along_x(vd_xr_min, vd_xr_max, i_y)
-
+    ! Iterate over each y index and calculate x-component of k, j
+    do i_y = vd_yl_min - 1, vd_yl_max + 1
+       call calc_along_x(vd_xl_min - 1, vd_xr_max + 1, i_y)
+    end do
+    do i_y = vd_yr_min - 1, vd_yr_max + 1
+       call calc_along_x(vd_xl_min - 1, vd_xr_max + 1, i_y)
+    end do
+    do i_y = vd_yl_max + 1, vd_yr_min - 1
+       call calc_along_x(vd_xl_min - 1, vd_xl_max + 1, i_y)
+       call calc_along_x(vd_xr_min - 1, vd_xr_max + 1, i_y)
     end do
 
-    ! Go along the entirety of the x-edge (left to right)
-    do i_x = vd_xl_min, vd_xr_max
-
-       ! Calculate k,j along the bottom side
-       call calc_along_y(i_x, vd_yl_min, vd_yl_max)
-       ! Calculate k,j along the top side
-       call calc_along_y(i_x, vd_yr_min, vd_yr_max)
-
+    ! Iterate over each x index and calculate y-component of k, j
+    do i_x = vd_xl_min - 1, vd_xl_max + 1
+       call calc_along_y(i_x, vd_yl_min - 1, vd_yr_max + 1)
+    end do
+    do i_x = vd_xr_min - 1, vd_xr_max + 1
+       call calc_along_y(i_x, vd_yl_min - 1, vd_yr_max + 1)
+    end do
+    do i_x = vd_xl_max + 1, vd_xr_min - 1
+       call calc_along_y(i_x, vd_yl_min - 1, vd_yl_max + 1)
+       call calc_along_y(i_x, vd_yr_min - 1, vd_yr_max + 1)
     end do
 
   contains
@@ -180,18 +188,18 @@ contains
       integer(dp) :: i_x_min, i_x_max, i_y
 
       call numerics_d1(phi_arr(i_x_min:i_x_max, i_y), &
-           k_arr(i_x_min:i_x_max, i_y), dx)
-      j_arr(i_x_min:i_x_max, i_y) = real(mag_arr(i_x_min:i_x_max, i_y) / m * &
-           k_arr(i_x_min:i_x_max, i_y))
+           kx_arr(i_x_min:i_x_max, i_y), dx)
+      jx_arr(i_x_min:i_x_max, i_y) = real(mag_arr(i_x_min:i_x_max, i_y) / m * &
+           kx_arr(i_x_min:i_x_max, i_y))
     end subroutine calc_along_x
 
     subroutine calc_along_y(i_x, i_y_min, i_y_max)
       integer(dp) :: i_x, i_y_min, i_y_max
 
       call numerics_d1(phi_arr(i_x, i_y_min:i_y_max), &
-           k_arr(i_x, i_y_min:i_y_max), dy)
-      j_arr(i_x, i_y_min:i_y_max) = real(mag_arr(i_x, i_y_min:i_y_max) / m * &
-           k_arr(i_x, i_y_min:i_y_max))
+           ky_arr(i_x, i_y_min:i_y_max), dy)
+      jy_arr(i_x, i_y_min:i_y_max) = real(mag_arr(i_x, i_y_min:i_y_max) / m * &
+           ky_arr(i_x, i_y_min:i_y_max))
     end subroutine calc_along_y
 
   end subroutine vd_calc_kj
@@ -203,33 +211,33 @@ contains
     integer(dp) :: i_x, i_y
 
     ! "left" end of VD grid
-    do i_x = vd_xl_min, vd_xl_max
+    do i_x = vd_xl_min - 1, vd_xl_max + 1
 
-       do i_y = vd_yl_min, vd_yr_max
+       do i_y = vd_yl_min - 1, vd_yr_max + 1
           call fill_by_index(i_x, i_y)
        end do
 
     end do
 
     ! "right" end of VD grid
-    do i_x = vd_xr_min, vd_xr_max
+    do i_x = vd_xr_min - 1, vd_xr_max + 1
 
-       do i_y = vd_yl_min, vd_yr_max
+       do i_y = vd_yl_min - 1, vd_yr_max + 1
           call fill_by_index(i_x, i_y)
        end do
 
     end do
 
     ! rest of VD grid
-    do i_x = vd_xl_max, vd_xr_min
+    do i_x = vd_xl_max + 1, vd_xr_min - 1
 
        ! unfilled portion of "bottom" end of VD grid
-       do i_y = vd_yl_min, vd_yl_max
+       do i_y = vd_yl_min - 1, vd_yl_max + 1
           call fill_by_index(i_x, i_y)
        end do
 
        ! unfilled portion of "top" end of VD grid
-       do i_y = vd_yr_min, vd_yr_max
+       do i_y = vd_yr_min - 1, vd_yr_max + 1
           call fill_by_index(i_x, i_y)
        end do
 
@@ -253,9 +261,11 @@ contains
   subroutine vd_cleanup()
 
     deallocate(phi_arr)
-    deallocate(k_arr)
+    deallocate(kx_arr)
+    deallocate(ky_arr)
     deallocate(mag_arr)
-    deallocate(j_arr)
+    deallocate(jx_arr)
+    deallocate(jy_arr)
 
   end subroutine vd_cleanup
 
