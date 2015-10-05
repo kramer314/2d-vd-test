@@ -5,7 +5,7 @@ module gaussian
   use progvars, only: hbar, m, En, phi, sig_x, sig_y, x0, y0
 
   implicit none
-  
+
   private
 
   public :: gaussian_init
@@ -22,7 +22,7 @@ module gaussian
   complex(dp) :: j_hb, jhb_m
 
 contains
-  
+
   subroutine gaussian_init()
 
     ! Precalculate some constants
@@ -33,7 +33,7 @@ contains
     p0_x_2m = p0_x_m / 2.0_dp
     p0_y_m = p0_y / m
     p0_y_2m = p0_y_m / 2.0_dp
-    
+
     sig_x2 = sig_x**2
     sig_y2 = sig_y**2
 
@@ -41,7 +41,7 @@ contains
     jhb_m = j * hbar / m
 
     !write(*,*) p0_x, p0_y
-    
+
   end subroutine gaussian_init
 
   subroutine gaussian_cleanup()
@@ -71,7 +71,7 @@ contains
          (2.0_dp * sig_x2 * (1 + jhb_m / sig_x2 * t))
     exp_y1 = - (y - p0_y_m * t)**2 / &
          (2.0_dp * sig_y2 * (1 + jhb_m / sig_y2 * t))
-    
+
     exp_x2 = j_hb * p0_x * (x - p0_x_2m * t)
     exp_y2 = j_hb * p0_y * (y - p0_y_2m * t)
 
@@ -79,7 +79,7 @@ contains
     exp_y = exp(exp_y1 + exp_y2)
 
     val = norm_x * norm_y * exp_x * exp_y
-    
+
   end function gaussian_xyt
-  
+
 end module gaussian
