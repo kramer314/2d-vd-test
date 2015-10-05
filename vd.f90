@@ -243,16 +243,16 @@ contains
 
     end do
 
-    ! Psi ~ exp(i S / hbar)
-    phi_arr = hbar * phi_arr
-
   contains
 
     subroutine fill_by_index(i_x, i_y)
       integer(dp) :: i_x, i_y
 
       z = psi_arr(i_x, i_y)
-      phi_arr(i_x, i_y) = numerics_cmplx_phase(z)
+
+      ! multiply by hbar here since Psi ~ exp(i S / hbar)
+      phi_arr(i_x, i_y) = numerics_cmplx_phase(z) * hbar
+
       mag_arr(i_x, i_y) = abs(z)**2
     end subroutine fill_by_index
 
