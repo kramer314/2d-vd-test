@@ -37,7 +37,7 @@ module progvars
   ! Useful VD grid indices (initialized by the VD module)
   integer(dp) :: vd_xl_min, vd_xl_max, vd_xr_min, vd_xr_max
   integer(dp) :: vd_yl_min, vd_yl_max, vd_yr_min, vd_yr_max
- 
+
   ! Virtual detector momentum bin parameters
   real(dp) :: vd_px_min, vd_px_max, vd_dpx
   real(dp) :: vd_py_min, vd_py_max, vd_dpy
@@ -58,5 +58,9 @@ module progvars
   real(dp), allocatable :: vd_px_arr(:), vd_py_arr(:)
   real(dp), allocatable :: npx_arr(:), npy_arr(:)
   complex(dp), allocatable :: psi_arr(:,:)
+
+  ! Theoretical result arrays / errors
+  real(dp), allocatable :: theor_npx_arr(:), theor_npy_arr(:)
+  real(dp), allocatable :: resid_npx_arr(:), resid_npy_arr(:)
 
 end module progvars

@@ -51,8 +51,6 @@ contains
     j_hb = j / hbar
     jhb_m = j * hbar / m
 
-    !write(*,*) p0_x, p0_y
-
     sig_p_x = hbar / sig_x
     sig_p_y = hbar / sig_y
 

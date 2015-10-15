@@ -23,7 +23,7 @@ contains
     call params_init()
     call gaussian_init()
     call vd_init()
-    
+
     call allocate_arrays()
     call init_arrays()
   end subroutine setup_init
@@ -45,12 +45,12 @@ contains
     ! initialize virtual detector grids
     call numerics_linspace(vd_px_min, vd_px_max, vd_px_arr, vd_dpx)
     call numerics_linspace(vd_py_min, vd_py_max, vd_py_arr, vd_dpy)
-    
+
     ! initialize virtual detector counts
-    npx_arr = 0.0_dp
-    npy_arr = 0.0_dp
+    npx_arr(:) = 0.0_dp
+    npy_arr(:) = 0.0_dp
   end subroutine init_arrays
-  
+
   subroutine allocate_arrays()
     allocate(psi_arr(nx, ny))
     allocate(t_range(nt))
@@ -59,9 +59,14 @@ contains
 
     allocate(vd_px_arr(vd_npx))
     allocate(vd_py_arr(vd_npy))
-    
+
     allocate(npx_arr(vd_npx))
     allocate(npy_arr(vd_npy))
+
+    allocate(theor_npx_arr(vd_npx))
+    allocate(theor_npy_arr(vd_npy))
+    allocate(resid_npx_arr(vd_npx))
+    allocate(resid_npy_arr(vd_npy))
   end subroutine allocate_arrays
 
   subroutine deallocate_arrays()
@@ -72,9 +77,14 @@ contains
 
     deallocate(vd_px_arr)
     deallocate(vd_py_arr)
-    
+
     deallocate(npx_arr)
     deallocate(npy_arr)
+
+    deallocate(theor_npx_arr)
+    deallocate(theor_npy_arr)
+    deallocate(resid_npx_arr)
+    deallocate(resid_npy_arr)
   end subroutine deallocate_arrays
-  
+
 end module setup
