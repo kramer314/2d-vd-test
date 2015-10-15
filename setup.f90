@@ -67,6 +67,8 @@ contains
     allocate(theor_npy_arr(vd_npy))
     allocate(resid_npx_arr(vd_npx))
     allocate(resid_npy_arr(vd_npy))
+    allocate(resid_npx_mask(vd_npx))
+    allocate(resid_npy_mask(vd_npx))
   end subroutine allocate_arrays
 
   subroutine deallocate_arrays()
@@ -85,6 +87,8 @@ contains
     deallocate(theor_npy_arr)
     deallocate(resid_npx_arr)
     deallocate(resid_npy_arr)
+    deallocate(resid_npx_mask)
+    deallocate(resid_npy_mask)
   end subroutine deallocate_arrays
 
 end module setup

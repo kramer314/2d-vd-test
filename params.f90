@@ -23,7 +23,7 @@ contains
     ! Gaussian parameters
     En = 10.0_dp
     phi = pi / 4.0_dp ! Equal momentum splitting
-    !phi = 0.0_dp
+    phi = 0.0_dp
     sig_x = 1.0_dp
     sig_y = 1.0_dp
     x0 = 0.0_dp
@@ -62,8 +62,12 @@ contains
 
     ! Time parameters
     t_min = 0.0_dp
-    t_max = 20.0_dp
+    t_max = 50.0_dp
     nt = int(5e2)
+
+    ! Residual analysis parameters
+    resid_x_eps = 1.0e-6_dp
+    resid_y_eps = 1.0e-6_dp
 
     ! Output parameters
     output_dir = "./output/"

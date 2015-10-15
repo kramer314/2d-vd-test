@@ -99,7 +99,7 @@ contains
   end subroutine vd_update
 
   subroutine vd_bin(npx_arr, npy_arr)
-    integer(dp) :: i_x, i_y
+    integer :: i_x, i_y
 
     real(dp), intent(inout) :: npx_arr(:), npy_arr(:)
 
@@ -147,14 +147,14 @@ contains
   contains
     subroutine accumulate_counts(i_x, i_y, p_arr, j_arr, count_arr,&
          p_bin_arr, dp_bin)
-      integer(dp), intent(in) :: i_x, i_y
+      integer, intent(in) :: i_x, i_y
       real(dp), intent(inout) :: count_arr(:)
       complex(dp), intent(in) :: p_arr(:,:)
       real(dp), intent(in) :: j_arr(:,:)
       real(dp), intent(in) :: p_bin_arr(:), dp_bin
 
       real(dp) :: p_bin_min
-      integer(dp) :: i_p
+      integer :: i_p
       real(dp) :: p
 
       p = real(p_arr(i_x, i_y))
@@ -174,7 +174,7 @@ contains
 
   subroutine vd_calc_pj()
 
-    integer(dp) :: i_x, i_y
+    integer :: i_x, i_y
 
     ! Iterate over each y index and calculate x-component of p, j
     do i_y = vd_yl_min - 1, vd_yl_max + 1
@@ -203,7 +203,7 @@ contains
   contains
 
     subroutine calc_along_x(i_x_min, i_x_max, i_y)
-      integer(dp) :: i_x_min, i_x_max, i_y
+      integer :: i_x_min, i_x_max, i_y
 
       call numerics_d1(phi_arr(i_x_min:i_x_max, i_y), &
            px_arr(i_x_min:i_x_max, i_y), dx)
@@ -212,7 +212,7 @@ contains
     end subroutine calc_along_x
 
     subroutine calc_along_y(i_x, i_y_min, i_y_max)
-      integer(dp) :: i_x, i_y_min, i_y_max
+      integer :: i_x, i_y_min, i_y_max
 
       call numerics_d1(phi_arr(i_x, i_y_min:i_y_max), &
            py_arr(i_x, i_y_min:i_y_max), dy)
@@ -226,7 +226,7 @@ contains
 
     complex(dp), intent(in) :: psi_arr(:,:)
     complex(dp) :: z
-    integer(dp) :: i_x, i_y
+    integer :: i_x, i_y
 
     ! "left" end of VD grid
     do i_x = vd_xl_min - 1, vd_xl_max + 1
@@ -264,7 +264,7 @@ contains
   contains
 
     subroutine fill_by_index(i_x, i_y)
-      integer(dp) :: i_x, i_y
+      integer :: i_x, i_y
 
       z = psi_arr(i_x, i_y)
 

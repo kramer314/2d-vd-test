@@ -26,32 +26,35 @@ module progvars
   ! Grid parameters
   real(dp) :: x_min, x_max, dx
   real(dp) :: y_min, y_max, dy
-  integer(dp) :: nx, ny
+  integer :: nx, ny
 
   ! Virtual detector grid parameters
   ! Left / right number of grid points outside region of interest
-  integer(dp) :: nxl_external, nxr_external, nyl_external, nyr_external
+  integer :: nxl_external, nxr_external, nyl_external, nyr_external
   ! Left / right number of virtual detector grid points in external grid
-  integer(dp) :: vd_nxl, vd_nxr, vd_nyl, vd_nyr
+  integer :: vd_nxl, vd_nxr, vd_nyl, vd_nyr
 
   ! Useful VD grid indices (initialized by the VD module)
-  integer(dp) :: vd_xl_min, vd_xl_max, vd_xr_min, vd_xr_max
-  integer(dp) :: vd_yl_min, vd_yl_max, vd_yr_min, vd_yr_max
+  integer :: vd_xl_min, vd_xl_max, vd_xr_min, vd_xr_max
+  integer :: vd_yl_min, vd_yl_max, vd_yr_min, vd_yr_max
 
   ! Virtual detector momentum bin parameters
   real(dp) :: vd_px_min, vd_px_max, vd_dpx
   real(dp) :: vd_py_min, vd_py_max, vd_dpy
-  integer(dp) :: vd_npx, vd_npy
+  integer :: vd_npx, vd_npy
 
   ! Time grid parameters
   real(dp) :: t_min, t_max, dt
-  integer(dp) :: nt
+  integer :: nt
+
+  ! Residual analysis parameters
+  real(dp) :: resid_x_eps, resid_y_eps
 
   ! Output parameters
   character(120) :: output_dir
   character(120) :: npx_fname, npy_fname
   logical :: output_px, output_py
-  integer(dp) :: print_mod_t, print_mod_px, print_mod_py
+  integer :: print_mod_t, print_mod_px, print_mod_py
 
   ! Arrays
   real(dp), allocatable :: x_range(:), y_range(:), t_range(:)
@@ -59,8 +62,9 @@ module progvars
   real(dp), allocatable :: npx_arr(:), npy_arr(:)
   complex(dp), allocatable :: psi_arr(:,:)
 
-  ! Theoretical result arrays / errors
+  ! Theoretical result / residual analysis arrays
   real(dp), allocatable :: theor_npx_arr(:), theor_npy_arr(:)
   real(dp), allocatable :: resid_npx_arr(:), resid_npy_arr(:)
+  logical, allocatable :: resid_npx_mask(:), resid_npy_mask(:)
 
 end module progvars

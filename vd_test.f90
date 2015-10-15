@@ -6,13 +6,14 @@ program vd_test
   use propagate, only: propagate_psi
   use setup, only: setup_init, setup_cleanup
   use vd, only: vd_update, vd_normalize
-  use gaussian, only: gaussian_xyt, gaussian_px, gaussian_py
-  use stats, only: stats_residuals
+  use gaussian, only: gaussian_px, gaussian_py
+  use stats, only: stats_residuals, stats_mean, stats_variance, stats_median, &
+       stats_stdev
 
   implicit none
 
-  integer(dp) :: i_t
-  integer(dp) :: i_px, i_py
+  integer :: i_t
+  integer :: i_px, i_py
   real(dp) :: px, py
 
   call setup_init()
@@ -33,6 +34,9 @@ program vd_test
   write(*,*)
 
   ! Propagate in time and run virtual detector
+  write(*,*)
+  write(*,*) "Beginning time propagation"
+  write(*,*) "Format: [current step] [total steps]"
   do i_t = 1, nt
      call propagate_psi(psi_arr, i_t)
 
@@ -71,12 +75,35 @@ program vd_test
      write(99, *) py, npy_arr(i_py), theor_npy_arr(i_py), resid_npy_arr(i_py)
   end do
 
+  ! Residual analysis
+  resid_npx_mask(:) = resid_npx_arr(:) .ge. resid_x_eps
+  resid_npy_mask(:) = resid_npy_arr(:) .ge. resid_y_eps
+
   write(*,*)
-  write(*,*) "Residual analysis between vd / theory: x, y"
+  write(*,*) "Residual analysis for detected/theoretical momentum distributions"
+  write(*,*) "Format: [Label] [x value] [y value]"
   write(*,*)
   write(*,*) "Sum of residuals:", sum(resid_npx_arr), sum(resid_npy_arr)
   write(*,*) "Sum of squared residauls:", sum(resid_npx_arr(:)**2), &
        sum(resid_npy_arr(:)**2)
+
+  write(*,*)
+  write(*,*) "Residual thresholds:", resid_x_eps, resid_y_eps
+  write(*,*) "Number of above-threshold residuals", &
+       count(resid_npx_mask), count(resid_npy_mask)
+
+  write(*,*)
+  write(*,*) "Mean of above-threshold residuals:", &
+       stats_mean(resid_npx_arr, mask=resid_npx_mask), &
+       stats_mean(resid_npy_arr, mask=resid_npy_mask)
+  write(*,*) "Median of above-threshold residuals:", &
+       stats_median(resid_npx_arr, mask=resid_npx_mask), &
+       stats_median(resid_npy_arr, mask=resid_npy_mask)
+  write(*,*) "Standard deviation of above-threshold residuals:", &
+       stats_stdev(resid_npx_arr, mask=resid_npx_mask), &
+       stats_stdev(resid_npy_arr, mask=resid_npy_mask)
+  write(*,*) "Maximum residuals:", maxval(resid_npx_arr), maxval(resid_npy_arr)
+  write(*,*) "Minimum residuals:", minval(resid_npx_arr), minval(resid_npy_arr)
 
   call setup_cleanup()
 

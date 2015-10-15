@@ -19,10 +19,10 @@ contains
     ! derivatives)
 
     complex(dp), intent(inout) :: psi_arr(:,:)
-    integer(dp), intent(in) :: i_t
+    integer, intent(in) :: i_t
 
     real(dp) :: x, y, t
-    integer(dp) :: i_x, i_y
+    integer :: i_x, i_y
 
     t = t_range(i_t)
 
