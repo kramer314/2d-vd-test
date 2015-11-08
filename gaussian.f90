@@ -99,7 +99,6 @@ contains
 
     complex(dp) :: exp_x1, exp_x2
     complex(dp) :: exp_y1, exp_y2
-    complex(dp) :: exp_x, exp_y
 
     ! Taken from Shankar, p. 154.
 
@@ -117,10 +116,7 @@ contains
     exp_x2 = j_hb * p0_x * ((x - x0) - p0_x_2m * t)
     exp_y2 = j_hb * p0_y * ((y - y0) - p0_y_2m * t)
 
-    exp_x = exp(exp_x1 + exp_x2)
-    exp_y = exp(exp_y1 + exp_y2)
-
-    val = norm_x * norm_y * exp_x * exp_y
+    val = norm_x * norm_y * exp(exp_x1 + exp_x2 + exp_y1 + exp_y2)
 
   end function gaussian_xyt
 
