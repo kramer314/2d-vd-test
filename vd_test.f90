@@ -8,7 +8,7 @@ program vd_test
   use vd, only: vd_update, vd_normalize
   use gaussian, only: gaussian_px, gaussian_py
   use stats, only: stats_residuals, stats_mean, stats_variance, stats_median, &
-       stats_stdev
+       stats_stdev, stats_mean_sq_err, stats_mean_abs_err
 
   implicit none
 
@@ -99,9 +99,15 @@ program vd_test
   write(*,*) "Median of above-threshold residuals:", &
        stats_median(resid_npx_arr, mask=resid_npx_mask), &
        stats_median(resid_npy_arr, mask=resid_npy_mask)
-  write(*,*) "Standard deviation of above-threshold residuals:", &
-       stats_stdev(resid_npx_arr, mask=resid_npx_mask), &
-       stats_stdev(resid_npy_arr, mask=resid_npy_mask)
+  write(*,*) "Variance of above-threshold residuals:", &
+       stats_variance(resid_npx_arr, mask=resid_npx_mask), &
+       stats_variance(resid_npy_arr, mask=resid_npy_mask)
+  write(*,*) "Mean squared error of above-threshold residuals:", &
+       stats_mean_sq_err(resid_npx_arr, mask=resid_npx_mask), &
+       stats_mean_sq_err(resid_npy_arr, mask=resid_npy_mask)
+  write(*,*) "Mean absolute error of above-threshold residuals:", &
+       stats_mean_abs_err(resid_npx_arr, mask=resid_npx_mask), &
+       stats_mean_abs_err(resid_npy_arr, mask=resid_npy_mask)
   write(*,*) "Maximum residuals:", maxval(resid_npx_arr), maxval(resid_npy_arr)
   write(*,*) "Minimum residuals:", minval(resid_npx_arr), minval(resid_npy_arr)
 

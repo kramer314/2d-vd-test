@@ -13,6 +13,8 @@ module stats
   public :: stats_residuals
   public :: stats_mean
   public :: stats_median
+  public :: stats_mean_sq_err
+  public :: stats_mean_abs_err
   public :: stats_variance
   public :: stats_stdev
 
@@ -74,6 +76,41 @@ contains
     deallocate(data_work_arr)
 
   end function stats_median
+
+  ! Calculate mean absolute error from residuals
+  real(dp) function stats_mean_abs_err(resid_arr, mask) result(val)
+    real(dp), intent(in) :: resid_arr(:)
+    logical, intent(in), optional :: mask(:)
+
+    integer :: n
+
+    if (present(mask)) then
+       n = count(mask)
+       val = sum(resid_arr, mask=mask) / n
+    else
+       n = size(resid_arr)
+       val = sum(resid_arr) / n
+    end if
+
+  end function stats_mean_abs_err
+
+  ! Calculate mean squared error from residuals
+  real(dp) function stats_mean_sq_err(resid_arr, mask) result(val)
+    real(dp), intent(in) :: resid_arr(:)
+    logical, intent(in), optional :: mask(:)
+
+
+    integer :: n
+
+    if (present(mask)) then
+       n = count(mask)
+       val = sum(resid_arr**2, mask=mask) / n
+    else
+       n = size(resid_arr)
+       val = sum(resid_arr**2) / n
+    end if
+
+  end function stats_mean_sq_err
 
   ! Calculate variance
   real(dp) function stats_variance(data_arr, mask) result(val)
