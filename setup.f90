@@ -10,6 +10,7 @@ module setup
   use gaussian, only: gaussian_init, gaussian_cleanup
   use numerics, only: numerics_linspace
   use vd, only: vd_init, vd_cleanup
+  use output, only: output_init, output_cleanup
 
   implicit none
 
@@ -23,12 +24,14 @@ contains
     call params_init()
     call gaussian_init()
     call vd_init()
+    call output_init()
 
     call allocate_arrays()
     call init_arrays()
   end subroutine setup_init
 
   subroutine setup_cleanup()
+    call output_cleanup()
     call vd_cleanup()
     call gaussian_cleanup()
     call params_cleanup()

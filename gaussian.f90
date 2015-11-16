@@ -7,7 +7,7 @@ module gaussian
   ! psi(x,0) = (1 / pi sig_x^2)^(1/4) exp(-1/2 ( (x-x0) / sig_x)^2) exp(i p0_x (x - x0) / hb)
 
   use globvars
-  use progvars, only: hbar, m, En, phi, sig_x, sig_y, x0, y0
+  use progvars, only: h, hbar, m, En, phi, sig_x, sig_y, x0, y0
 
   implicit none
 
@@ -18,6 +18,7 @@ module gaussian
   public :: gaussian_xyt
   public :: gaussian_px
   public :: gaussian_py
+  public :: gaussian_calc_theor_npxy
 
   ! Precalculated constants
   real(dp) :: p0_x, p0_y
@@ -119,5 +120,25 @@ contains
     val = norm_x * norm_y * exp(exp_x1 + exp_x2 + exp_y1 + exp_y2)
 
   end function gaussian_xyt
+
+  subroutine gaussian_calc_theor_npxy(vd_px_arr, vd_py_arr, &
+    theor_npx_arr, theor_npy_arr)
+
+    real(dp), intent(in) :: vd_px_arr(:), vd_py_arr(:)
+    real(dp), intent(inout) :: theor_npx_arr(:), theor_npy_arr(:)
+
+    integer :: i_px, i_py
+    real(dp) :: px, py
+
+    do i_px = 1, size(theor_npx_arr)
+       px = vd_px_arr(i_px)
+       theor_npx_arr(i_px) = abs(gaussian_px(px))**2
+    end do
+    do i_py = 1, size(theor_npy_arr)
+       py = vd_py_arr(i_py)
+       theor_npy_arr(i_py) = abs(gaussian_py(py))**2
+    end do
+
+  end subroutine gaussian_calc_theor_npxy
 
 end module gaussian

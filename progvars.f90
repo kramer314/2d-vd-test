@@ -9,6 +9,7 @@ module progvars
 
   ! Units
   real(dp) :: hbar
+  real(dp) :: h
 
   ! Particle parameters
   real(dp) :: m
@@ -52,7 +53,8 @@ module progvars
 
   ! Output parameters
   character(120) :: output_dir
-  character(120) :: npx_fname, npy_fname
+  character(120) :: log_fname, params_fname
+  character(120) :: vd_px_fname, vd_py_fname, vd_stats_fname
   logical :: output_px, output_py
   integer :: print_mod_t, print_mod_px, print_mod_py
 

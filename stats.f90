@@ -19,8 +19,13 @@ module stats
   public :: stats_stdev
 
 contains
-  ! Calculate residuals
+
   subroutine stats_residuals(data_arr, theor_arr, resid_arr)
+    ! Calculate residuals
+    !
+    ! data_arr :: array of experimental data values
+    ! theor_arr :: array of theoretical values, parallel to data_arr
+    ! resid_arr :: array to populate with residuals
     real(dp), intent(in) :: data_arr(:), theor_arr(:)
     real(dp), intent(inout) :: resid_arr(:)
 
@@ -28,8 +33,11 @@ contains
 
   end subroutine stats_residuals
 
-  ! Calculate mean
   real(dp) function stats_mean(data_arr, mask) result(val)
+    ! Calculate mean
+    !
+    ! data_arr :: array of data values
+    ! mask :: logical masking array
     real(dp), intent(in) :: data_arr(:)
     logical, intent(in), optional :: mask(:)
 
@@ -45,9 +53,11 @@ contains
 
   end function stats_mean
 
-  ! Calculate median
   real(dp) function stats_median(data_arr, mask) result(val)
-
+    ! Calculate median
+    !
+    ! data_arr :: array of data values
+    ! mask :: logical masking array
     real(dp), intent(in) :: data_arr(:)
     logical, intent(in), optional :: mask(:)
 
@@ -77,8 +87,11 @@ contains
 
   end function stats_median
 
-  ! Calculate mean absolute error from residuals
   real(dp) function stats_mean_abs_err(resid_arr, mask) result(val)
+    ! Calculate mean absolute error from residuals
+    !
+    ! resid_arr :: residual arrays
+    ! mask :: logical masking array
     real(dp), intent(in) :: resid_arr(:)
     logical, intent(in), optional :: mask(:)
 
@@ -94,11 +107,13 @@ contains
 
   end function stats_mean_abs_err
 
-  ! Calculate mean squared error from residuals
   real(dp) function stats_mean_sq_err(resid_arr, mask) result(val)
+    ! Calculate mean squared error from residuals
+    !
+    ! resid_arr :: residual arrays
+    ! mask :: logical masking array
     real(dp), intent(in) :: resid_arr(:)
     logical, intent(in), optional :: mask(:)
-
 
     integer :: n
 
@@ -112,8 +127,11 @@ contains
 
   end function stats_mean_sq_err
 
-  ! Calculate variance
   real(dp) function stats_variance(data_arr, mask) result(val)
+    ! Calculate variance
+    !
+    ! data_arr :: array of data values
+    ! mask :: logical masking array
     real(dp), intent(in) :: data_arr(:)
     logical, intent(in), optional :: mask(:)
 
@@ -136,8 +154,11 @@ contains
 
   end function stats_variance
 
-  ! Compute standard deviation
   real(dp) function stats_stdev(data_arr, mask) result(val)
+    ! Compute standard deviation
+    !
+    ! data :: array of data values
+    ! mask :: logical masking array
     real(dp), intent(in) :: data_arr(:)
     logical, intent(in), optional :: mask(:)
 
@@ -148,4 +169,5 @@ contains
     end if
 
   end function stats_stdev
+
 end module stats

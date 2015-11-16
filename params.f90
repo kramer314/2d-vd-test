@@ -16,12 +16,13 @@ contains
   subroutine params_init()
     ! Units
     hbar = 1.0_dp
+    h = 2.0_dp * pi * hbar
 
     ! Particle parameters
     m = 1.0_dp
 
     ! Gaussian parameters
-    En = 10.0_dp
+    En = 12.5_dp ! p = sqrt(2mE) = 5
     phi = pi / 4.0_dp ! Equal momentum splitting
     phi = 0.0_dp
     sig_x = 1.0_dp
@@ -31,11 +32,11 @@ contains
 
     ! Numerical grid parameters
     x_min = -10.0_dp
-    x_max = 50_dp
-    nx = int(1e3)
+    x_max = 25_dp
+    nx = int(3e3)
 
     y_min = -10.0_dp
-    y_max = 50.0_dp
+    y_max = 25.0_dp
     ny = int(1e3)
 
     ! External ("non-interaction") part of the grid
@@ -46,9 +47,9 @@ contains
 
     ! # of grid points used as virtual detector
     ! (placed right outside the interaction region)
-    vd_nxl = 1
-    vd_nxr = 5
-    vd_nyl = 1
+    vd_nxl = 5
+    vd_nxr = 20
+    vd_nyl = 5
     vd_nyr = 5
 
     ! Virtual detector binning parameters
@@ -62,8 +63,8 @@ contains
 
     ! Time parameters
     t_min = 0.0_dp
-    t_max = 50.0_dp
-    nt = int(5e2)
+    t_max = 15_dp
+    nt = int(1e2)
 
     ! Residual analysis parameters
     resid_x_eps = 1.0e-6_dp
@@ -71,8 +72,11 @@ contains
 
     ! Output parameters
     output_dir = "./output/"
-    npx_fname = "pxt.dat"
-    npy_fname = "pyt.dat"
+    params_fname = "vd_params.dat"
+    vd_px_fname = "vd_px.dat"
+    vd_py_fname = "vd_py.dat"
+    log_fname = "log.dat"
+    vd_stats_fname = "vd_stats.dat"
     output_px = .true.
     output_py = .true.
 

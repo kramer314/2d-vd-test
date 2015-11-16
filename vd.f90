@@ -143,7 +143,7 @@ contains
                vd_py_arr, vd_dpy)
        end do
     end do
-!
+
   contains
     subroutine accumulate_counts(i_x, i_y, p_arr, j_arr, count_arr,&
          p_bin_arr, dp_bin)
